@@ -1,2 +1,11 @@
- mat-card { margin: 16px; }
-    img { max-width: 100%; height: auto; }
+mat-card { margin: 16px; }
+img { max-width: 100%; height: auto; }
+
+.div_regresar{
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Space between fields */
+  padding: 16px;
+  max-width: 100px; /* Optional: Limit width for better look */
+  margin: 0 auto; /* Center the form */
+}

@@ -4,6 +4,8 @@ import { MatCardModule } from '@angular/material/card';
 import { PostService } from '../../post.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
+import { Router } from '@angular/router';
 
 
 interface Post {
@@ -19,13 +21,15 @@ interface Post {
   imports: [MatCardModule, 
             MatButtonModule,
             CommonModule,
-            FormsModule],
+            FormsModule,
+            MatTableModule],
   templateUrl: './post-list.component.html',
   styleUrl: './post-list.component.css'
 })
 export class PostListComponent implements OnInit {
   posts: Post[] = [];
-   constructor(private postService: PostService) {}
+   constructor(private postService: PostService, 
+               private router: Router) {}
 
    ngOnInit() {
     this.postService.getPosts().subscribe((posts) => {
@@ -40,5 +44,18 @@ export class PostListComponent implements OnInit {
       console.error('Error fetching posts:', error); // Debug: Catch errors
     });
   }
+  navigateToHome(): void {
+      this.router.navigate(['/posts']); // Navigates to the root path
+    }
+
+    eliminar(item: any){
+      this.postService.eliminarPost(item.id).subscribe({
+         next:(response:any)=>{
+          this.postService.getPosts();      
+        },error:(response:any)=>{
+          console.log("error");
+        }  
+      })
+    }
 
 }

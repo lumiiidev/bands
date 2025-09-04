@@ -6,6 +6,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { PostService } from '../../post.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-post-form',
@@ -22,7 +23,8 @@ import { PostService } from '../../post.service';
 export class PostFormComponent {
    postForm: FormGroup;
   selectedFile: File | null = null;
-   constructor(private fb: FormBuilder, private postService: PostService) {
+   constructor(private fb: FormBuilder, private postService: PostService, 
+               private router: Router) {
     this.postForm = this.fb.group({
       title: ['', Validators.required],
       content: ['', Validators.required],
@@ -45,10 +47,15 @@ export class PostFormComponent {
         next: () => {
           this.postForm.reset();
           this.selectedFile = null;
+          this.navigateToLists();
           // Optionally navigate to post list or emit event
         },
         error: (err) => console.error('Error creating post:', err),
       });
     }
   }
+
+  navigateToLists(): void {
+      this.router.navigate(['/lists']); // Navigates to the root path
+    }
 }
