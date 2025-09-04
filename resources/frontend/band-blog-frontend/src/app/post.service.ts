@@ -1,19 +1,29 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+interface Post {
+  id?: number;
+  title: string;
+  content: string;
+  image?: string | null;
+}
+
+@Injectable({
+  providedIn: 'root',
+})
 export class PostService {
-  private apiUrl = 'http://127.0.0.1:8000/api/posts';  // Your Laravel API
+  private apiUrl = 'http://127.0.0.1:8000/api/posts'; // Adjust if using Laragon virtual host
 
   constructor(private http: HttpClient) {}
 
-  getPosts(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  getPosts(): Observable<Post[]> {
+    return this.http.get<{ status: number; message: string; data: Post[] }>(this.apiUrl).pipe(
+      map(response => response.data)
+    );
   }
 
-  createPost(formData: FormData): Observable<any> {
-    return this.http.post(this.apiUrl, formData);
+  createPost(formData: FormData): Observable<Post> {
+    return this.http.post<Post>(this.apiUrl, formData);
   }
-  // Add updatePost(id: number, formData: FormData), deletePost(id: number)
 }

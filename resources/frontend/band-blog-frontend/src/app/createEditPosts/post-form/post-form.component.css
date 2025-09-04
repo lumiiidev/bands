@@ -1,0 +1,29 @@
+.post-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Space between fields */
+  padding: 16px;
+  max-width: 200px; /* Optional: Limit width for better look */
+  margin: 0 auto; /* Center the form */
+}
+
+mat-form-field {
+  width: 100%; /* Ensure fields take full width of container */
+}
+
+.submit-button {
+  margin-top: 16px; /* Space above the button */
+}
+
+input[type="file"] {
+  padding: 8px; /* Match Material input padding */
+  border: 1px solid #ccc; /* Basic border for consistency */
+  border-radius: 4px; /* Rounded corners */
+  gap: 16px;   
+  
+}
+
+mat-error {
+  font-size: 12px; /* Smaller error text */
+  color: #f44336; /* Material red for errors */
+}

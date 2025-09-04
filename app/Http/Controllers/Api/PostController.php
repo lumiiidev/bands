@@ -17,19 +17,21 @@ class PostController extends Controller
     public function index()
     {
         try {
-            $posts = Post::all();
-            return response()->json([
-                'status' => 200,
-                'message' => 'posts',
-                'data' => $posts
-            ], 200);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => 500,
-                'message' => 'Error al obtener la lista de usuarios: ' . $e->getMessage(),
-                'data' => null
-            ], 500);
-        }       
+        $posts = Post::all();
+        \Log::info('Fetched posts:', ['posts' => $posts->toArray()]);
+        return response()->json([
+            'status' => 200,
+            'message' => 'posts',
+            'data' => $posts
+        ], 200);
+    } catch (Exception $e) {
+        \Log::error('Error in index: ' . $e->getMessage());
+        return response()->json([
+            'status' => 500,
+            'message' => 'Error al obtener la lista de usuarios: ' . $e->getMessage(),
+            'data' => null
+        ], 500);
+    }
        
     }
 
@@ -38,33 +40,55 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $post = Post::create($request->only(['title', 'content']));  // Validate in real apps!
-        return $post;
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048', // Max 2MB
+        ]);
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('images', 'public');
+        }
+
+        return Post::create($validated);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
+    public function show(Post $post) {
+        return $post; // Get single post
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Post $post)
-    {
-        $post->update($request->only(['title', 'content']));
+        public function update(Request $request, Post $post) {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            if ($post->image) {
+                Storage::disk('public')->delete($post->image); // Delete old image
+            }
+            $validated['image'] = $request->file('image')->store('images', 'public');
+        }
+
+        $post->update($validated);
         return $post;
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
-    {
+     public function destroy(Post $post) {
+        if ($post->image) {
+            Storage::disk('public')->delete($post->image); // Delete image
+        }
         $post->delete();
-        return response()->json(['message' => 'Deleted']);
+        return response()->json(['message' => 'Post deleted']);
     }
 }
